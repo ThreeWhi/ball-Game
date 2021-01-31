@@ -24,43 +24,47 @@ let ball = {
     d: 'u'
 }
 
+//block
+let blockX = [];
+let blockY = [];
+blockX[0] = 25;
+blockY[0] = 25;
+
+for (i = 1; i < 11; i++) {
+    blockX[i] = blockX[0] + (scale * 2 + 2) * i;
+}
+
+for (i = 1; i < 11; i++) {
+    blockY[i] = blockY[0] + (scale * 2 + 2) * i;
+}
+
 //funzioni
 function update() {
     clear();
-    movePlayer();
     moveBall();
+    movePlayer();
+    drawBlock();
     drawBall();
     drawPlayer();
     collisionRules();
+    blockRules();
     game();
 
     setTimeout(update, 1000 / time);
 };
-
-function drawBall() {
-    ctx.fillStyle = 'red';
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
-}
 
 function clear() {
     ctx.fillStyle = 'rgba(51, 51, 51, 0.8)';
     ctx.fillRect(0, 0, width, height);
 }
 
-function drawPlayer() {
-    ctx.fillStyle = 'green';
-    ctx.fillRect(player.x, player.y, scale * 3, scale);
-}
-
 function movePlayer() {
     if (start == true) {
         if (player.d == 'r') {
-            player.x += scale / 1.8;
+            player.x += scale / 1.5;
         }
         if (player.d == 'l') {
-            player.x -= scale / 1.8;
+            player.x -= scale / 1.5;
         }
     }
 }
@@ -86,6 +90,44 @@ function moveBall() {
     }
 }
 
+function drawBlock() {
+//    for (j = 0; j < 5; j++) {
+        for (i = 0; i < 20; i++) {
+            ctx.fillStyle = 'aqua';
+            ctx.fillRect(blockX[i], blockY[0], scale * 2, scale)
+        }
+//    }
+}
+
+function blockRules() {
+    for (i = 0; i < 11; i++)  {
+        if (ball.x > blockX[i] - ball.r && ball.y > blockY[0] - ball.r) {
+            if (ball.x < blockX[i] + (scale * 2) + ball.r && ball.y < blockY[0] + scale + ball.r) {
+                blockX[i] = undefined;
+                if (ball.d == 'ur') {
+                    ball.d = 'rb'
+                }
+                if (ball.d == 'lu') {
+                    ball.d = 'bl'
+                }
+                
+            }
+        }
+    }
+}
+
+function drawPlayer() {
+    ctx.fillStyle = 'green';
+    ctx.fillRect(player.x, player.y, scale * 3, scale);
+}
+
+function drawBall() {
+    ctx.fillStyle = 'red';
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
+}
+
 function collisionRules() {
     //player 
     if (player.x < 0) {
@@ -96,41 +138,41 @@ function collisionRules() {
     }
 
     //ball 
-    if (ball.d == 'lu' && ball.x < 0 + ball.r) {
+    if (ball.d == 'lu' && ball.x <= 0 + ball.r) {
         ball.d = 'ur';
     }
-    if (ball.d == 'ur' && ball.y < 0 + ball.r) {
+    if (ball.d == 'ur' && ball.y <= 0 + ball.r) {
         ball.d = 'rb';
     }
-    if (ball.d == 'rb' && ball.x > width - ball.r) {
+    if (ball.d == 'rb' && ball.x >= width - ball.r) {
         ball.d = 'bl';
     }
-    if (ball.d == 'bl' && ball.y > height) {
+    if (ball.d == 'bl' && ball.y >= height) {
         start = false;
         GameOver()
     }
     ///////////////////////////////////////////////
-    if (ball.d == 'ur' && ball.x > width - scale) {
+    if (ball.d == 'ur' && ball.x >= width - scale) {
         ball.d = 'lu'
     }
-    if (ball.d == 'lu' && ball.y < 0 + scale) {
+    if (ball.d == 'lu' && ball.y <= 0 + ball.r) {
         ball.d = 'bl'
     }
-    if (ball.d == 'bl' && ball.x < 0 + scale) {
+    if (ball.d == 'bl' && ball.x <= 0 + ball.r) {
         ball.d = 'rb'
     }
-    if (ball.d == 'rb' && ball.y > height) {
+    if (ball.d == 'rb' && ball.y >= height) {
         start = false;
         GameOver()
     }
     //ball && player 
-    if (ball.d == 'bl' && ball.x > player.x && ball.y > player.y - (ball.r * 2)) {
-        if (ball.x < player.x + (scale * 3) && ball.y < player.y + scale) {
+    if (ball.d == 'bl' && ball.x > player.x - ball.r && ball.y > player.y - (ball.r * 2)) {
+        if (ball.x < player.x + (scale * 3) + ball.r && ball.y < player.y + scale) {
             ball.d = 'lu';
         }
     }
-    if (ball.d == 'rb' && ball.x > player.x && ball.y > player.y - (ball.r * 2)) {
-        if (ball.x < player.x + (scale * 3) && ball.y < player.y + scale) {
+    if (ball.d == 'rb' && ball.x > player.x - ball.r && ball.y > player.y - (ball.r * 2) + ball.r) {
+        if (ball.x < player.x + (scale * 3) + ball.r && ball.y < player.y + scale) {
             ball.d = 'ur';
         }
     }
@@ -147,6 +189,10 @@ function game() {
 }
 
 function GameOver() {
+    for (i = 1; i < 11; i++) {
+        blockX[i] = blockX[0] + (scale * 2 + 2) * i;
+    }
+    drawBlock();
     alert('GameOver');
 }
 
